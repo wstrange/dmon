@@ -1,13 +1,12 @@
 name: linux_proc
-description: A starting point for Dart libraries or applications.
+description: Parse Linux process and service information
 version: 0.0.1
 publish_to: none
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/wstrange/systemd_ui/linux_proc
 
 environment:
   sdk: ^3.2.6
 
-# Add regular dependencies here.
 dependencies:
   dbus: ^0.7.10
   # path: ^1.8.0
