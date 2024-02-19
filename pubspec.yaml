@@ -34,6 +34,8 @@ dependencies:
   signals: ^4.2.3
   window_manager: ^0.3.8
   yaru: ^1.2.1
+  linux_proc:
+    path: linux_proc
 
 
 dev_dependencies:
