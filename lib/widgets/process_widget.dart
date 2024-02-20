@@ -38,10 +38,25 @@ class ProcessWidget extends StatelessWidget {
 }
 
 /// Example without a datasource
-class ProcessTable extends StatelessWidget {
+class ProcessTable extends StatefulWidget {
   final List<Process> processList;
 
   const ProcessTable(this.processList, {super.key});
+
+  @override
+  State<ProcessTable> createState() => _ProcessTableState();
+}
+
+class _ProcessTableState extends State<ProcessTable> {
+  int currentIndex = 0;
+  bool ascending = true;
+
+  void _sort(int columnIndex, bool asc) {
+    setState(() {
+      currentIndex = columnIndex;
+      ascending = asc;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,25 +65,35 @@ class ProcessTable extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: DataTable2(
               columnSpacing: 5,
-              sortColumnIndex: 1,
+              sortColumnIndex: currentIndex,
+              sortAscending: ascending,
               horizontalMargin: 5,
               isHorizontalScrollBarVisible: true,
               isVerticalScrollBarVisible: true,
               dividerThickness: 1,
               minWidth: 600,
               dataRowHeight: 20,
-              columns: const [
+              columns: [
                 DataColumn2(
                   label: Text('cmd'),
                   // size: ColumnSize.L,
+                  onSort: (columnIndex, ascending) =>
+                      _sort(columnIndex, ascending),
                 ),
                 DataColumn(
                   label: Text('utime'),
                   numeric: true,
+                  onSort: (columnIndex, ascending) =>
+                      _sort(columnIndex, ascending),
                 ),
-                DataColumn(label: Text('sys'), numeric: true),
+                DataColumn(
+                  label: Text('sys'),
+                  numeric: true,
+                  onSort: (columnIndex, ascending) =>
+                      _sort(columnIndex, ascending),
+                ),
               ],
-              rows: processList
+              rows: widget.processList
                   .map((process) => DataRow(cells: [
                         DataCell(Text(process.command)),
                         DataCell(Text(process.userTime.toString())),
