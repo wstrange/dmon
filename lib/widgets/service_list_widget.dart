@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
-
-import '../src/sysd.dart';
+import 'package:linux_proc/linux_proc.dart';
 
 final svc = futureSignal(() => sysdSvc.getUnits());
 
@@ -10,29 +9,32 @@ class ServiceListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Watch(
-      (context) => Column(children: [
-        Row(
-          children: [
-            ElevatedButton(
-                onPressed: () {
-                  print('refresh');
-                  svc.reload();
-                },
-                child: const Text('Refresh')),
-            ElevatedButton(
-                onPressed: () {
-                  print('remove');
-                },
-                child: const Text('Clear')),
-          ],
-        ),
-        switch (svc.value) {
-          AsyncData data => _SvcList(data.requireValue as List<Service>),
-          AsyncError error => Text('error: ${error.error}'),
-          _ => const Text('loading..'),
-        },
-      ]),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Watch(
+        (context) => Column(children: [
+          Row(
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    debugPrint('refresh');
+                    svc.reload();
+                  },
+                  child: const Icon(Icons.refresh)),
+              // ElevatedButton(
+              //     onPressed: () {
+              //       print('remove');
+              //     },
+              //     child: const Text('Clear')),
+            ],
+          ),
+          switch (svc.value) {
+            AsyncData data => _SvcList(data.requireValue as List<Service>),
+            AsyncError error => Text('error: ${error.error}'),
+            _ => const Text('loading..'),
+          },
+        ]),
+      ),
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:systemd_ui/widgets/process_widget.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'widgets/home_page.dart';
+import 'widgets/service_list_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +51,23 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: const TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.ac_unit)),
+                Tab(icon: Icon(Icons.ac_unit))
+              ],
+            ),
+          ),
+          body: const TabBarView(children: [
+            ServiceListWidget(),
+            ProcessWidget(),
+          ]),
+        ),
+      ),
     );
   }
 }
