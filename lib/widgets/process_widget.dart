@@ -47,11 +47,16 @@ class ProcessTable extends StatefulWidget {
   State<ProcessTable> createState() => _ProcessTableState();
 }
 
+typedef ProcField = Comparable Function(Process p);
+
 class _ProcessTableState extends State<ProcessTable> {
   int currentIndex = 0;
   bool ascending = true;
 
-  void _sort(int columnIndex, bool asc) {
+  void _sort(int columnIndex, bool asc, ProcField fn) {
+    widget.processList
+        .sort((a, b) => asc ? fn(a).compareTo(fn(b)) : fn(b).compareTo(fn(a)));
+
     setState(() {
       currentIndex = columnIndex;
       ascending = asc;
@@ -75,26 +80,37 @@ class _ProcessTableState extends State<ProcessTable> {
               dataRowHeight: 20,
               columns: [
                 DataColumn2(
-                  label: Text('cmd'),
-                  // size: ColumnSize.L,
-                  onSort: (columnIndex, ascending) =>
-                      _sort(columnIndex, ascending),
-                ),
-                DataColumn(
-                  label: Text('utime'),
+                  label: Text('pid'),
                   numeric: true,
+                  fixedWidth: 50,
                   onSort: (columnIndex, ascending) =>
-                      _sort(columnIndex, ascending),
+                      _sort(columnIndex, ascending, (Process p) => p.pid),
                 ),
+                DataColumn2(
+                    label: Text('User'),
+                    fixedWidth: 80,
+                    onSort: (columnIndex, ascending) => _sort(
+                        columnIndex, ascending, (Process p) => p.userName)),
+                DataColumn2(
+                    label: Text('cmd'),
+                    // size: ColumnSize.L,
+                    onSort: (columnIndex, ascending) => _sort(
+                        columnIndex, ascending, (Process p) => p.command)),
                 DataColumn(
-                  label: Text('sys'),
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort(columnIndex, ascending),
-                ),
+                    label: Text('utime'),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) => _sort(
+                        columnIndex, ascending, (Process p) => p.userTime)),
+                DataColumn(
+                    label: Text('sys'),
+                    numeric: true,
+                    onSort: (columnIndex, ascending) => _sort(
+                        columnIndex, ascending, (Process p) => p.systemTime)),
               ],
               rows: widget.processList
                   .map((process) => DataRow(cells: [
+                        DataCell(Text(process.pid.toString())),
+                        DataCell(Text(process.userName)),
                         DataCell(Text(process.command)),
                         DataCell(Text(process.userTime.toString())),
                         DataCell(Text(process.systemTime.toString())),
