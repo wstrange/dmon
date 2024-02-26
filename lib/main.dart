@@ -57,14 +57,14 @@ class MyApp extends StatelessWidget {
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.ac_unit)),
-                Tab(icon: Icon(Icons.ac_unit))
+                Tab(icon: Icon(Icons.memory), text: 'Processes'),
+                Tab(icon: Icon(Icons.settings), text: 'Systemd'),
               ],
             ),
           ),
           body: const TabBarView(children: [
-            ServiceListWidget(),
             ProcessWidget(),
+            ServiceListWidget(),
           ]),
         ),
       ),
