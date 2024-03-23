@@ -65,6 +65,8 @@ class _ProcessTableState extends State<ProcessTable> {
     timer = Timer.periodic(const Duration(seconds: 10), (_) {
       debugPrint('tick');
 
+      procs.refresh();
+
       _sort(0, ascending, currentSortFunction);
 
       // setState(() {

@@ -93,10 +93,10 @@ packages:
     dependency: "direct main"
     description:
       name: data_table_2
-      sha256: cec4010dd756bd7d0cc3eb8a30932b8109608132c6c8d643e80ea412d3e51a9c
+      sha256: fdb0551f103f1daf837bddfde14619fd9e683408833a618c9afabeb533fce88c
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.10"
+    version: "2.5.11"
   dbus:
     dependency: "direct main"
     description:
@@ -163,14 +163,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  gtk:
-    dependency: transitive
-    description:
-      name: gtk
-      sha256: e8ce9ca4b1df106e4d72dad201d345ea1a036cc12c360f1a7d5a758f78ffa42c
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -314,14 +306,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
-  platform:
-    dependency: transitive
-    description:
-      name: platform
-      sha256: "12220bb4b65720483f8fa9450b4332347737cf8213dd2840d8b2c823e47243ec"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.4"
   pool:
     dependency: transitive
     description:
@@ -382,26 +366,26 @@ packages:
     dependency: "direct main"
     description:
       name: signals
-      sha256: f45228fd14ff484c1cdf7341d6efb0d50273027a4a10864a1744df69147e400b
+      sha256: a411a60a180570d23446ed233bbf7330384188d446302a47c032f3c14e4fc6cb
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.0"
+    version: "4.5.1"
   signals_core:
     dependency: transitive
     description:
       name: signals_core
-      sha256: efe4c23474716d4ba0f183d232bfda413463e7a63341e9a772c239fc5870415b
+      sha256: "29258212f4e89297e7a6abbc0a000fda934bfa6d8b5634c30ce31ec1033bf9e4"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.1"
+    version: "4.5.0"
   signals_flutter:
     dependency: transitive
     description:
       name: signals_flutter
-      sha256: b44babc61a837b27144974afc1e3bf7f65b80c5ef47f6efeb7f2d2e03d1d6220
+      sha256: dd4971b2a0165d1ef8de1a45d59e89cdcdd5fc1c8f7fa180d55e6d049be89e92
       url: "https://pub.dev"
     source: hosted
-    version: "4.3.0"
+    version: "4.5.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -567,14 +551,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
-  yaru:
-    dependency: "direct main"
-    description:
-      name: yaru
-      sha256: "572850652931d0c0a3baa6d1ad880f7fea6ffa45a2821e04272357a656485fa7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.1"
 sdks:
   dart: ">=3.3.0 <4.0.0"
   flutter: ">=3.18.0-18.0.pre.54"
