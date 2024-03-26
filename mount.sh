@@ -2,5 +2,6 @@
 
 sudo mount -t virtiofs com.apple.virtio-fs.automount /mnt/shared 
 
-cd /mnt/shared/dart/systemd_ui
+cd /mnt/shared/dart/dmon
+
 
