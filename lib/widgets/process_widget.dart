@@ -4,16 +4,13 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:linux_proc/linux_proc.dart';
 import 'package:signals/signals_flutter.dart';
-
-final statsManager = StatsManager(refreshTimeSeconds: 2);
-final statsSignal = statsManager.stream.toSignal();
-final procListsignal = listSignal(<Process>[]);
+import 'signals.dart';
 
 final dispose = effect(() {
   if (statsSignal.value.hasValue) {
     var p = statsSignal.requireValue.processes;
     procListsignal.value = p;
-    print('updated signal');
+    // print('updated signal');
   }
 });
 
@@ -22,31 +19,9 @@ class ProcessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text('process'),
-              IconButton(
-                  onPressed: () {
-                    ///procs.refresh();
-                  },
-                  icon: const Icon(Icons.refresh)),
-              Watch((context) => Text('plist ${procListsignal.length}'))
-            ],
-          ),
-          const ProcessTable(),
-          // Watch((context) => switch (statsSignal.value) {
-          //       AsyncData<Stats> data => ProcessTable(data.value.processes),
-          //       AsyncError error => Text('error: ${error.error}'),
-          //       _ => const Text('loading..'),
-          //     }),
-        ],
-      ),
+    return const Padding(
+      padding: EdgeInsets.all(8.0),
+      child: ProcessTable(),
     );
   }
 }

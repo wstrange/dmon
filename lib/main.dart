@@ -1,4 +1,6 @@
+import 'package:dmon/widgets/resource_graph_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'widgets/process_widget.dart';
@@ -8,6 +10,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Must add this line.
   await windowManager.ensureInitialized();
+
+  // To supress signals debug messages comment this out:
+  SignalsObserver.instance = null;
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(500, 800),
@@ -37,19 +42,21 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Scaffold(
           appBar: AppBar(
             bottom: const TabBar(
               tabs: [
                 Tab(icon: Icon(Icons.memory), text: 'Processes'),
                 Tab(icon: Icon(Icons.settings), text: 'Systemd'),
+                Tab(icon: Icon(Icons.auto_graph), text: 'Resources'),
               ],
             ),
           ),
           body: const TabBarView(children: [
             ProcessWidget(),
             ServiceListWidget(),
+            ResourceGraphWidget(),
           ]),
         ),
       ),
