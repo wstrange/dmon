@@ -10,13 +10,14 @@ dependencies:
   dbus: ^0.7.10
   flutter:
     sdk: flutter
-  signals: ^5.0.0
+  signals: ^5.2.0
   window_manager: ^0.3.8
   # yaru: ^1.2.1
   linux_proc:
     path: ../linux_proc
   data_table_2: ^2.5.11
   fl_chart: ^0.67.0
+  collection: ^1.18.0
 
 
 

@@ -73,78 +73,74 @@ class _ProcessTableState extends State<ProcessTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Watch(
-            (context) {
-              if (statsSignal.value.hasValue) {
-                procList = statsSignal.value.requireValue.processes;
-              }
-              return DataTable2(
-                  columnSpacing: 5,
-                  sortColumnIndex: currentIndex,
-                  sortAscending: ascending,
-                  horizontalMargin: 5,
-                  isHorizontalScrollBarVisible: false,
-                  isVerticalScrollBarVisible: true,
-                  scrollController: scrollController,
-                  horizontalScrollController: horizontalController,
-                  dividerThickness: 1,
-                  minWidth: 800,
-                  dataRowHeight: 20,
-                  columns: [
-                    DataColumn2(
-                      label: const Text('pid'),
-                      numeric: true,
-                      fixedWidth: 50,
-                      onSort: (columnIndex, ascending) => _sort(
-                          columnIndex, ascending, (Process p) => p.procPid),
-                    ),
-                    const DataColumn2(label: Text('state'), fixedWidth: 50),
-                    DataColumn2(
-                        label: const Text('User'),
-                        fixedWidth: 80,
-                        onSort: (columnIndex, ascending) => _sort(
-                            columnIndex, ascending, (Process p) => p.userName)),
-                    DataColumn2(
-                        label: const Text('%CPU'),
-                        fixedWidth: 80,
-                        numeric: true,
-                        onSort: (columnIndex, ascending) => _sort(columnIndex,
-                            ascending, (Process p) => p.cpuPercentage)),
-                    DataColumn2(
-                        label: const Text('utime'),
-                        fixedWidth: 80,
-                        numeric: true,
-                        onSort: (columnIndex, ascending) => _sort(
-                            columnIndex, ascending, (Process p) => p.userTime)),
-                    DataColumn2(
-                        label: const Text('sys'),
-                        numeric: true,
-                        fixedWidth: 80,
-                        onSort: (columnIndex, ascending) => _sort(columnIndex,
-                            ascending, (Process p) => p.systemTime)),
-                    DataColumn2(
-                        label: const Text('cmd'),
-                        // fixedWidth: 120,
-                        onSort: (columnIndex, ascending) => _sort(
-                            columnIndex, ascending, (Process p) => p.command)),
-                  ],
-                  rows: procList
-                      .map((process) => DataRow(cells: [
-                            DataCell(Text(process.procPid.toString())),
-                            DataCell(Text(process.state)),
-                            DataCell(Text(process.userName)),
-                            DataCell(
-                                Text(process.cpuPercentage.toStringAsFixed(1))),
-                            DataCell(Text(process.userTime.toString())),
-                            DataCell(Text(process.systemTime.toString())),
-                            DataCell(Text(process.command)),
-                          ]))
-                      .toList());
-            },
-          )),
+    return Watch(
+      (context) {
+        if (!statsSignal.value.hasValue) {
+          return const CircularProgressIndicator();
+        }
+        procList = statsSignal.value.requireValue.processes;
+        return DataTable2(
+            columnSpacing: 5,
+            sortColumnIndex: currentIndex,
+            sortAscending: ascending,
+            horizontalMargin: 5,
+            isHorizontalScrollBarVisible: false,
+            isVerticalScrollBarVisible: true,
+            scrollController: scrollController,
+            horizontalScrollController: horizontalController,
+            dividerThickness: 1,
+            minWidth: 800,
+            dataRowHeight: 20,
+            columns: [
+              DataColumn2(
+                label: const Text('pid'),
+                numeric: true,
+                fixedWidth: 50,
+                onSort: (columnIndex, ascending) =>
+                    _sort(columnIndex, ascending, (Process p) => p.procPid),
+              ),
+              const DataColumn2(label: Text('state'), fixedWidth: 50),
+              DataColumn2(
+                  label: const Text('User'),
+                  fixedWidth: 80,
+                  onSort: (columnIndex, ascending) =>
+                      _sort(columnIndex, ascending, (Process p) => p.userName)),
+              DataColumn2(
+                  label: const Text('%CPU'),
+                  fixedWidth: 80,
+                  numeric: true,
+                  onSort: (columnIndex, ascending) => _sort(
+                      columnIndex, ascending, (Process p) => p.cpuPercentage)),
+              DataColumn2(
+                  label: const Text('utime'),
+                  fixedWidth: 80,
+                  numeric: true,
+                  onSort: (columnIndex, ascending) =>
+                      _sort(columnIndex, ascending, (Process p) => p.userTime)),
+              DataColumn2(
+                  label: const Text('sys'),
+                  numeric: true,
+                  fixedWidth: 80,
+                  onSort: (columnIndex, ascending) => _sort(
+                      columnIndex, ascending, (Process p) => p.systemTime)),
+              DataColumn2(
+                  label: const Text('cmd'),
+                  // fixedWidth: 120,
+                  onSort: (columnIndex, ascending) =>
+                      _sort(columnIndex, ascending, (Process p) => p.command)),
+            ],
+            rows: procList
+                .map((process) => DataRow(cells: [
+                      DataCell(Text(process.procPid.toString())),
+                      DataCell(Text(process.state)),
+                      DataCell(Text(process.userName)),
+                      DataCell(Text(process.cpuPercentage.toStringAsFixed(1))),
+                      DataCell(Text(process.userTime.toString())),
+                      DataCell(Text(process.systemTime.toString())),
+                      DataCell(Text(process.command)),
+                    ]))
+                .toList());
+      },
     );
   }
 }
