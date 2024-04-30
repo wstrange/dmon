@@ -15,9 +15,11 @@ class ResourceGraphWidget extends StatefulWidget {
 class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
   final _userCPU = Queue<double>();
   final _systemCPU = Queue<double>();
+  double userTime = 0;
+  double systemTime = 0;
+  double idleTime = 100;
 
-  int maxPoints = 100;
-  int currentPoint = 0;
+  final maxPoints = 100;
   StreamSubscription? subscription;
 
   @override
@@ -26,20 +28,17 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
     // Listen to the stream and update data points
     subscription = statsManager.stream.listen((data) {
       setState(() {
-        var u = data.stats.userTimePercentage;
-        var s = data.stats.systemTimePercentage;
-        print('u= $u s = $s');
-        _systemCPU.addLast(s);
+        userTime = data.stats.userTimePercentage;
+        systemTime = data.stats.systemTimePercentage;
+        idleTime = data.stats.idleTimePercentage;
+        _systemCPU.addLast(systemTime);
         // we want the user cpu to be stacked on top of the system
         // so we add it to system.
-        _userCPU.addLast(s + u);
+        _userCPU.addLast(systemTime + userTime);
         if (_userCPU.length > maxPoints) {
           _userCPU.removeFirst();
           _systemCPU.removeFirst();
         }
-        // _dataPoints.add(FlSpot(currentPoint.toDouble(), u));
-        // _dataPoints = List.from(_dataPoints);
-        ++currentPoint;
       });
     });
   }
@@ -57,21 +56,38 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      // mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('$currentPoint'),
+        Column(
+          children: [
+            const SizedBox(
+              height: 100,
+            ),
+            Text(
+              '       user: ${userTime.toStringAsFixed(1)}',
+              style: const TextStyle(color: Colors.blue),
+            ),
+            Text(
+              'system: ${systemTime.toStringAsFixed(1)}',
+              style: const TextStyle(color: Colors.red),
+            ),
+            Text('           idle:  ${idleTime.toStringAsFixed(1)}'),
+          ],
+        ),
         SizedBox(
-          height: 400,
-          width: 400,
+          height: 200,
+          width: 200,
           child: LineChart(
             LineChartData(
               minX: 0, // Adjust based on your data
-              maxX: 200, // Adjust based on your data
+              maxX: maxPoints.toDouble(), // Adjust based on your data
               minY: 0, // Adjust based on your data
               maxY: 100, // Adjust based on your data
 
               titlesData: const FlTitlesData(
-                show: true,
+                show: false,
                 // bottomTitles: AxisTitles(Text('CPU')),
                 // Customize titles and labels as needed
               ),
@@ -85,15 +101,23 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
               ),
               lineBarsData: [
                 LineChartBarData(
-                  show: _systemCPU.isNotEmpty,
-                  spots: _pointsToFlSpotList(_systemCPU),
-                  color: Colors.pink,
-                ),
-                LineChartBarData(
                   show: _userCPU.isNotEmpty,
                   spots: _pointsToFlSpotList(_userCPU),
-                  color: Colors.green,
-                )
+                  color: Colors.blue,
+                  isCurved: true,
+                  dotData: const FlDotData(show: false),
+                  belowBarData:
+                      BarAreaData(show: true, color: Colors.lightBlue.shade50),
+                ),
+
+                LineChartBarData(
+                    show: _systemCPU.isNotEmpty,
+                    spots: _pointsToFlSpotList(_systemCPU),
+                    color: Colors.red,
+                    dotData: const FlDotData(show: false),
+                    belowBarData:
+                        BarAreaData(show: true, color: Colors.red.shade50),
+                    isCurved: true),
 
                 // LineChartBarData(
                 //   show: _dataPoints.isNotEmpty,
