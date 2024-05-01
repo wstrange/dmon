@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dmon/widgets/cpu_load_text.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:collection';
@@ -56,86 +57,75 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      // mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            const SizedBox(
-              height: 100,
-            ),
-            Text(
-              '       user: ${userTime.toStringAsFixed(1)}',
-              style: const TextStyle(color: Colors.blue),
-            ),
-            Text(
-              'system: ${systemTime.toStringAsFixed(1)}',
-              style: const TextStyle(color: Colors.red),
-            ),
-            Text('           idle:  ${idleTime.toStringAsFixed(1)}'),
-          ],
-        ),
-        SizedBox(
-          height: 200,
-          width: 200,
-          child: LineChart(
-            LineChartData(
-              minX: 0, // Adjust based on your data
-              maxX: maxPoints.toDouble(), // Adjust based on your data
-              minY: 0, // Adjust based on your data
-              maxY: 100, // Adjust based on your data
+    return Container(
+      alignment: Alignment.topCenter,
+      child: Row(
+        // mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          CPULoadText(
+              userTime: userTime, systemTime: systemTime, idleTime: idleTime),
+          SizedBox(
+            height: 100,
+            width: 200,
+            child: LineChart(
+              LineChartData(
+                minX: 0, // Adjust based on your data
+                maxX: maxPoints.toDouble(), // Adjust based on your data
+                minY: 0, // Adjust based on your data
+                maxY: 100, // Adjust based on your data
 
-              titlesData: const FlTitlesData(
-                show: false,
-                // bottomTitles: AxisTitles(Text('CPU')),
-                // Customize titles and labels as needed
-              ),
-              gridData: const FlGridData(
-                show: false,
-                // Customize grid lines as needed
-              ),
-              borderData: FlBorderData(
-                show: false,
-                // Customize border as needed
-              ),
-              lineBarsData: [
-                LineChartBarData(
-                  show: _userCPU.isNotEmpty,
-                  spots: _pointsToFlSpotList(_userCPU),
-                  color: Colors.blue,
-                  isCurved: true,
-                  dotData: const FlDotData(show: false),
-                  belowBarData:
-                      BarAreaData(show: true, color: Colors.lightBlue.shade50),
+                titlesData: const FlTitlesData(
+                  show: false,
+                  // bottomTitles: AxisTitles(Text('CPU')),
+                  // Customize titles and labels as needed
                 ),
-
-                LineChartBarData(
-                    show: _systemCPU.isNotEmpty,
-                    spots: _pointsToFlSpotList(_systemCPU),
-                    color: Colors.red,
+                gridData: const FlGridData(
+                  show: false,
+                  // Customize grid lines as needed
+                ),
+                borderData: FlBorderData(
+                  show: false,
+                  // Customize border as needed
+                ),
+                lineBarsData: [
+                  LineChartBarData(
+                    show: _userCPU.isNotEmpty,
+                    spots: _pointsToFlSpotList(_userCPU),
+                    color: Colors.blue,
+                    isCurved: true,
                     dotData: const FlDotData(show: false),
-                    belowBarData:
-                        BarAreaData(show: true, color: Colors.red.shade50),
-                    isCurved: true),
+                    belowBarData: BarAreaData(
+                        show: true, color: Colors.lightBlue.shade50),
+                  ),
 
-                // LineChartBarData(
-                //   show: _dataPoints.isNotEmpty,
-                //   spots: _dataPoints,
-                //   isCurved: false, // Change to true for curved lines
-                //   barWidth: 2,
-                //   color: Colors.blue, // Customize color
-                //   dotData: const FlDotData(show: false), // Customize dots
-                //   belowBarData: BarAreaData(
-                //     show: true,
-                //     color: Colors.lightBlue,
-                //   ),
-                // ),
-              ],
+                  LineChartBarData(
+                      show: _systemCPU.isNotEmpty,
+                      spots: _pointsToFlSpotList(_systemCPU),
+                      color: Colors.red,
+                      dotData: const FlDotData(show: false),
+                      belowBarData:
+                          BarAreaData(show: true, color: Colors.red.shade50),
+                      isCurved: true),
+
+                  // LineChartBarData(
+                  //   show: _dataPoints.isNotEmpty,
+                  //   spots: _dataPoints,
+                  //   isCurved: false, // Change to true for curved lines
+                  //   barWidth: 2,
+                  //   color: Colors.blue, // Customize color
+                  //   dotData: const FlDotData(show: false), // Customize dots
+                  //   belowBarData: BarAreaData(
+                  //     show: true,
+                  //     color: Colors.lightBlue,
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
