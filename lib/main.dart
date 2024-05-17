@@ -15,10 +15,10 @@ void main() async {
   // To supress signals debug messages comment this out:
   SignalsObserver.instance = null;
 
-  initSignls();
+  initSignals();
 
   WindowOptions windowOptions = const WindowOptions(
-    size: Size(500, 800),
+    size: Size(600, 800),
     center: false,
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
@@ -32,8 +32,30 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WindowListener {
+  @override
+  void initState() {
+    super.initState();
+    windowManager.addListener(this);
+  }
+
+  @override
+  void onWindowMinimize() {
+    // set refresh to 0 to pause stats refresh
+    statsManager.setRefreshSeconds(0);
+  }
+
+  @override
+  void onWindowRestore() {
+    statsManager.setRefreshSeconds(refreshTime.value);
+  }
 
   // This widget is the root of your application.
   @override

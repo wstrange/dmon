@@ -40,13 +40,13 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
   }
 
   // Return a list of FlSpots to display. The X coordinate is
-  // the integer 0..100  where each increment is a sample. The
-  // Y is the systemCPU percentage to plot
+  // the integer 0..100  where each increment is one sample. The
+  // Y is the systemCPU percentage
   List<FlSpot> sysCPU() {
     int i = 0;
     return statsManager.statsQueue
         .map((s) => FlSpot((i++).toDouble(), s.stats.systemTimePercentage))
-        .toList();
+        .toList(growable: false);
   }
 
   // User CPU should stack on top of system - so we add it to the system time
@@ -55,7 +55,7 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
     return statsManager.statsQueue
         .map((s) => FlSpot((i++).toDouble(),
             s.stats.systemTimePercentage + s.stats.userTimePercentage))
-        .toList();
+        .toList(growable: false);
   }
 
   @override

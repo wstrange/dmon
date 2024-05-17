@@ -4,8 +4,10 @@ import 'package:signals/signals.dart';
 
 const statsQueueSize = 100;
 
-final statsManager =
-    StatsManager(refreshTimeSeconds: 4, queueSize: statsQueueSize);
+final refreshTime = Signal(4);
+
+final statsManager = StatsManager(
+    refreshTimeSeconds: refreshTime.value, queueSize: statsQueueSize);
 // A stream of Linux process and system Stats
 final statsStreamSignal = statsManager.stream.toSignal();
 final procListsignal = listSignal(<Process>[]);
@@ -14,7 +16,7 @@ final currentStats = Signal<Stats>(statsManager.currentStats);
 
 final c = connect(currentStats);
 
-void initSignls() {
+void initSignals() {
   c.from(statsManager.stream);
 
   effect(() {
