@@ -1,4 +1,5 @@
 import 'package:dmon/widgets/resource_graph_widget.dart';
+import 'package:dmon/widgets/signals.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:window_manager/window_manager.dart';
@@ -13,6 +14,8 @@ void main() async {
 
   // To supress signals debug messages comment this out:
   SignalsObserver.instance = null;
+
+  initSignls();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(500, 800),

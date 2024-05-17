@@ -7,8 +7,8 @@ import 'package:signals/signals_flutter.dart';
 import 'signals.dart';
 
 final dispose = effect(() {
-  if (statsSignal.value.hasValue) {
-    var p = statsSignal.requireValue.processes;
+  if (statsStreamSignal.value.hasValue) {
+    var p = statsStreamSignal.requireValue.processes;
     procListsignal.value = p;
     // print('updated signal');
   }
@@ -62,7 +62,7 @@ class _ProcessTableState extends State<ProcessTable> {
     // Sort the current view
     Process.sort(procList, fn, asc);
     // set the sort order for subsequent processes
-    statsManager.setSortOrder(fn, asc);
+    statsManager.setProcessSortOrder(fn, asc);
 
     setState(() {
       currentSortFunction = fn;
@@ -75,10 +75,10 @@ class _ProcessTableState extends State<ProcessTable> {
   Widget build(BuildContext context) {
     return Watch(
       (context) {
-        if (!statsSignal.value.hasValue) {
+        if (!statsStreamSignal.value.hasValue) {
           return const CircularProgressIndicator();
         }
-        procList = statsSignal.value.requireValue.processes;
+        procList = statsStreamSignal.value.requireValue.processes;
         return DataTable2(
             columnSpacing: 5,
             sortColumnIndex: currentIndex,

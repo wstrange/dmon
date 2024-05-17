@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:dmon/widgets/cpu_load_text.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:signals/signals_flutter.dart';
 import 'dart:collection';
 import 'signals.dart';
 
@@ -20,7 +20,7 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
   double systemTime = 0;
   double idleTime = 100;
 
-  final maxPoints = 100;
+  final maxPoints = statsQueueSize;
   StreamSubscription? subscription;
 
   @override
@@ -59,15 +59,23 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.topCenter,
+      height: 100,
+      width: 300,
       child: Row(
-        // mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          Watch((ctx) {
+            var x = currentStats.value.memInfo.memAvailable;
+            return Text(x.toString());
+          }),
           CPULoadText(
               userTime: userTime, systemTime: systemTime, idleTime: idleTime),
-          SizedBox(
+          Container(
             height: 100,
-            width: 200,
+            width: 300,
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue),
+                borderRadius: BorderRadius.circular(10)),
             child: LineChart(
               LineChartData(
                 minX: 0, // Adjust based on your data
