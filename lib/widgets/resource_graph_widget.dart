@@ -3,7 +3,6 @@ import 'package:dmon/widgets/cpu_load_text.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
-import 'dart:collection';
 import 'signals.dart';
 
 class ResourceGraphWidget extends StatefulWidget {
@@ -14,32 +13,22 @@ class ResourceGraphWidget extends StatefulWidget {
 }
 
 class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
-  final _userCPU = Queue<double>();
-  final _systemCPU = Queue<double>();
   double userTime = 0;
   double systemTime = 0;
   double idleTime = 100;
 
-  final maxPoints = statsQueueSize;
   StreamSubscription? subscription;
 
   @override
   void initState() {
     super.initState();
+
     // Listen to the stream and update data points
     subscription = statsManager.stream.listen((data) {
       setState(() {
         userTime = data.stats.userTimePercentage;
         systemTime = data.stats.systemTimePercentage;
         idleTime = data.stats.idleTimePercentage;
-        _systemCPU.addLast(systemTime);
-        // we want the user cpu to be stacked on top of the system
-        // so we add it to system.
-        _userCPU.addLast(systemTime + userTime);
-        if (_userCPU.length > maxPoints) {
-          _userCPU.removeFirst();
-          _systemCPU.removeFirst();
-        }
       });
     });
   }
@@ -50,9 +39,23 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
     subscription?.cancel();
   }
 
-  List<FlSpot> _pointsToFlSpotList(Queue<double> q) {
+  // Return a list of FlSpots to display. The X coordinate is
+  // the integer 0..100  where each increment is a sample. The
+  // Y is the systemCPU percentage to plot
+  List<FlSpot> sysCPU() {
     int i = 0;
-    return q.map((item) => FlSpot((i++).toDouble(), item)).toList();
+    return statsManager.statsQueue
+        .map((s) => FlSpot((i++).toDouble(), s.stats.systemTimePercentage))
+        .toList();
+  }
+
+  // User CPU should stack on top of system - so we add it to the system time
+  List<FlSpot> userCPU() {
+    int i = 0;
+    return statsManager.statsQueue
+        .map((s) => FlSpot((i++).toDouble(),
+            s.stats.systemTimePercentage + s.stats.userTimePercentage))
+        .toList();
   }
 
   @override
@@ -79,7 +82,7 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
             child: LineChart(
               LineChartData(
                 minX: 0, // Adjust based on your data
-                maxX: maxPoints.toDouble(), // Adjust based on your data
+                maxX: 100, // Adjust based on your data
                 minY: 0, // Adjust based on your data
                 maxY: 100, // Adjust based on your data
 
@@ -98,8 +101,8 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
                 ),
                 lineBarsData: [
                   LineChartBarData(
-                    show: _userCPU.isNotEmpty,
-                    spots: _pointsToFlSpotList(_userCPU),
+                    show: statsManager.statsQueue.isNotEmpty,
+                    spots: userCPU(),
                     color: Colors.blue,
                     isCurved: true,
                     dotData: const FlDotData(show: false),
@@ -108,8 +111,8 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
                   ),
 
                   LineChartBarData(
-                      show: _systemCPU.isNotEmpty,
-                      spots: _pointsToFlSpotList(_systemCPU),
+                      show: statsManager.statsQueue.isNotEmpty,
+                      spots: sysCPU(),
                       color: Colors.red,
                       dotData: const FlDotData(show: false),
                       belowBarData:
