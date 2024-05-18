@@ -4,7 +4,7 @@ import 'package:signals/signals.dart';
 
 const statsQueueSize = 100;
 
-final refreshTime = Signal(4);
+final refreshTime = Signal(5);
 
 final statsManager = StatsManager(
     refreshTimeSeconds: refreshTime.value, queueSize: statsQueueSize);

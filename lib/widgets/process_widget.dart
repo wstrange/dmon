@@ -1,5 +1,7 @@
 // Widget to show process status - like top
 
+import 'dart:io' as dartio;
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:linux_proc/linux_proc.dart';
@@ -91,6 +93,7 @@ class _ProcessTableState extends State<ProcessTable> {
             dividerThickness: 1,
             minWidth: 800,
             dataRowHeight: 20,
+            showCheckboxColumn: false,
             columns: [
               DataColumn2(
                 label: const Text('pid'),
@@ -130,17 +133,41 @@ class _ProcessTableState extends State<ProcessTable> {
                       _sort(columnIndex, ascending, (Process p) => p.command)),
             ],
             rows: procList
-                .map((process) => DataRow(cells: [
-                      DataCell(Text(process.procPid.toString())),
-                      DataCell(Text(process.state)),
-                      DataCell(Text(process.userName)),
-                      DataCell(Text(process.cpuPercentage.toStringAsFixed(1))),
-                      DataCell(Text(process.userTime.toString())),
-                      DataCell(Text(process.systemTime.toString())),
-                      DataCell(Text(process.command)),
-                    ]))
+                .map((process) => DataRow(
+                        onSelectChanged: (value) =>
+                            _showProcessDialog(context, process),
+                        cells: [
+                          DataCell(Text(process.procPid.toString())),
+                          DataCell(Text(process.state)),
+                          DataCell(Text(process.userName)),
+                          DataCell(
+                              Text(process.cpuPercentage.toStringAsFixed(1))),
+                          DataCell(Text(process.userTime.toString())),
+                          DataCell(Text(process.systemTime.toString())),
+                          DataCell(Text(process.command)),
+                        ]))
                 .toList());
       },
     );
+  }
+
+  _showProcessDialog(BuildContext context, Process p) {
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            title: Text('${p.procPid} ${p.command}'),
+            content: Text('user: ${p.userName}'),
+            actions: [
+              TextButton(
+                  child: Text('Kill ${p.procPid}'),
+                  onPressed: () {
+                    // todo: How to sigkill a process!
+                    dartio.Process.killPid(p.procPid);
+                    Navigator.of(context).pop();
+                  }),
+            ],
+          );
+        });
   }
 }
