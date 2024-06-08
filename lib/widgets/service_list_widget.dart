@@ -67,22 +67,40 @@ class _SvcWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-        onTap: () {
-          print('tap ${service.unitName}');
-        },
-        onHover: (s) {},
-        child: Row(children: [
-          Flexible(
-            child: Tooltip(
-              message: service.description,
-              preferBelow: false,
-              child: Text(
-                '${service.unitName}',
-                softWrap: true,
-              ),
-            ),
-          ),
-        ]));
+    return ListTile(
+      dense: true,
+      leading: const Icon(Icons.offline_bolt_sharp),
+      title: Text(service.unitName),
+      subtitle: Text(service.description),
+      trailing: Text(service.loadeState),
+      isThreeLine: false,
+      tileColor: Colors.lightBlue[50],
+      shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
+    );
+
+    // InkWell(
+    //   onTap: () {
+    //     print('tap ${service.unitName}');
+    //   },
+    //   onHover: (s) {},
+    //   child: ListTile(
+    //     dense: true,
+    //     leading: Text(service.unitName),
+
+    //   ),
+
+    //   // child: Row(children: [
+    //   //   Flexible(
+    //   //     child: Tooltip(
+    //   //       message: service.description,
+    //   //       preferBelow: false,
+    //   //       child: Text(
+    //   //         '${service.unitName}',
+    //   //         softWrap: true,
+    //   //       ),
+    //   //     ),
+    //   //   ),
+    //   // ])
+    // );
   }
 }
