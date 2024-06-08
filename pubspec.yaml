@@ -10,7 +10,7 @@ dependencies:
   dbus: ^0.7.10
   flutter:
     sdk: flutter
-  signals: ^5.2.1
+  signals: ^5.2.2
   window_manager: ^0.3.8
   # yaru: ^1.2.1
   linux_proc:

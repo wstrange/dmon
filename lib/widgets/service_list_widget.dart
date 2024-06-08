@@ -48,7 +48,7 @@ class _SvcList extends StatelessWidget {
   Widget build(BuildContext context) {
     final scroller = ScrollController();
 
-    var c = svcList.map((i) => Text(i.name)).toList();
+    var c = svcList.map((svc) => _SvcWidget(service: svc)).toList();
 
     return Flexible(
         child: Scrollbar(
@@ -57,5 +57,32 @@ class _SvcList extends StatelessWidget {
             thickness: 8.0,
             controller: scroller,
             child: ListView(controller: scroller, children: c)));
+  }
+}
+
+class _SvcWidget extends StatelessWidget {
+  final Service service;
+
+  const _SvcWidget({super.key, required this.service});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+        onTap: () {
+          print('tap ${service.unitName}');
+        },
+        onHover: (s) {},
+        child: Row(children: [
+          Flexible(
+            child: Tooltip(
+              message: service.description,
+              preferBelow: false,
+              child: Text(
+                '${service.unitName}',
+                softWrap: true,
+              ),
+            ),
+          ),
+        ]));
   }
 }
