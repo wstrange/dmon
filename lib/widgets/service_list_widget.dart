@@ -63,19 +63,48 @@ class _SvcList extends StatelessWidget {
 class _SvcWidget extends StatelessWidget {
   final Service service;
 
-  const _SvcWidget({super.key, required this.service});
+  const _SvcWidget({required this.service});
 
   @override
   Widget build(BuildContext context) {
+    Future<void> serviceDialog(Service service) async {
+      await showDialog(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: Text(service.unitName),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      sysdSvc.startUnit(service.unitName);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Start Service')),
+                TextButton(
+                    onPressed: () {
+                      sysdSvc.stopUnit(service.unitName);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Stop Service')),
+                IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
+            );
+          });
+    }
+
     return ListTile(
       dense: true,
       leading: const Icon(Icons.offline_bolt_sharp),
       title: Text(service.unitName),
       subtitle: Text(service.description),
-      trailing: Text(service.loadeState),
+      trailing: Text('${service.loadeState}:${service.subState}'),
       isThreeLine: false,
       tileColor: Colors.lightBlue[50],
       shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      onTap: () => serviceDialog(service),
     );
 
     // InkWell(
