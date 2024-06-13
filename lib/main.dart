@@ -1,9 +1,8 @@
 import 'package:dmon/widgets/resource_graph_widget.dart';
-import 'package:dmon/widgets/signals.dart';
+import 'package:dmon/widgets/providers.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:window_manager/window_manager.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'widgets/process_widget.dart';
 import 'widgets/service_list_widget.dart';
 
@@ -11,11 +10,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Must add this line.
   await windowManager.ensureInitialized();
-
-  // To supress signals debug messages comment this out:
-  SignalsObserver.instance = null;
-
-  initSignals();
 
   WindowOptions windowOptions = const WindowOptions(
     size: Size(600, 800),
@@ -29,17 +23,17 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WindowListener {
+class _MyAppState extends ConsumerState<MyApp> with WindowListener {
   @override
   void initState() {
     super.initState();
@@ -49,12 +43,14 @@ class _MyAppState extends State<MyApp> with WindowListener {
   @override
   void onWindowMinimize() {
     // set refresh to 0 to pause stats refresh
+
     statsManager.setRefreshSeconds(0);
   }
 
   @override
   void onWindowRestore() {
-    statsManager.setRefreshSeconds(refreshTime.value);
+    var r = ref.watch(refreshTimeProvider);
+    statsManager.setRefreshSeconds(r);
   }
 
   // This widget is the root of your application.
@@ -78,10 +74,10 @@ class _MyAppState extends State<MyApp> with WindowListener {
               ],
             ),
           ),
-          body: const TabBarView(children: [
-            ProcessWidget(),
+          body: TabBarView(children: [
+            const ProcessWidget(),
             ServiceListWidget(),
-            ResourceGraphWidget(),
+            const ResourceGraphWidget(),
           ]),
         ),
       ),

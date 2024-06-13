@@ -2,17 +2,18 @@ import 'dart:async';
 import 'package:dmon/widgets/cpu_load_text.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
-import 'signals.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'providers.dart';
 
-class ResourceGraphWidget extends StatefulWidget {
+class ResourceGraphWidget extends ConsumerStatefulWidget {
   const ResourceGraphWidget({super.key});
 
   @override
-  State<ResourceGraphWidget> createState() => _ResourceGraphWidgetState();
+  ConsumerState<ResourceGraphWidget> createState() =>
+      _ResourceGraphWidgetState();
 }
 
-class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
+class _ResourceGraphWidgetState extends ConsumerState<ResourceGraphWidget> {
   double userTime = 0;
   double systemTime = 0;
   double idleTime = 100;
@@ -67,10 +68,7 @@ class _ResourceGraphWidgetState extends State<ResourceGraphWidget> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Watch((ctx) {
-            var x = currentStats.value.memInfo.memAvailable;
-            return Text(x.toString());
-          }),
+          Text(statsManager.currentStats.memInfo.memAvailable.toString()),
           CPULoadText(
               userTime: userTime, systemTime: systemTime, idleTime: idleTime),
           Container(

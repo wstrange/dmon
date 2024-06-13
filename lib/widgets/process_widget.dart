@@ -5,16 +5,10 @@ import 'dart:io' as dartio;
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:linux_proc/linux_proc.dart';
-import 'package:signals/signals_flutter.dart';
-import 'signals.dart';
 
-final dispose = effect(() {
-  if (statsStreamSignal.value.hasValue) {
-    var p = statsStreamSignal.requireValue.processes;
-    procListsignal.value = p;
-    // print('updated signal');
-  }
-});
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'providers.dart';
 
 class ProcessWidget extends StatelessWidget {
   const ProcessWidget({super.key});
@@ -29,18 +23,18 @@ class ProcessWidget extends StatelessWidget {
 }
 
 /// Example without a datasource
-class ProcessTable extends StatefulWidget {
+class ProcessTable extends ConsumerStatefulWidget {
   // final List<Process> processList;
 
   const ProcessTable({super.key});
 
   @override
-  State<ProcessTable> createState() => _ProcessTableState();
+  ConsumerState<ProcessTable> createState() => _ProcessTableState();
 }
 
 typedef ProcField = Comparable Function(Process p);
 
-class _ProcessTableState extends State<ProcessTable> {
+class _ProcessTableState extends ConsumerState<ProcessTable> {
   int currentIndex = 0;
   bool ascending = true;
   ProcField currentSortFunction = (Process p) => p.procPid;
@@ -75,80 +69,78 @@ class _ProcessTableState extends State<ProcessTable> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch(
-      (context) {
-        if (!statsStreamSignal.value.hasValue) {
-          return const CircularProgressIndicator();
-        }
-        procList = statsStreamSignal.value.requireValue.processes;
-        return DataTable2(
-            columnSpacing: 5,
-            sortColumnIndex: currentIndex,
-            sortAscending: ascending,
-            horizontalMargin: 5,
-            isHorizontalScrollBarVisible: false,
-            isVerticalScrollBarVisible: true,
-            scrollController: scrollController,
-            horizontalScrollController: horizontalController,
-            dividerThickness: 1,
-            minWidth: 800,
-            dataRowHeight: 20,
-            showCheckboxColumn: false,
-            columns: [
-              DataColumn2(
-                label: const Text('pid'),
-                numeric: true,
-                fixedWidth: 50,
-                onSort: (columnIndex, ascending) =>
-                    _sort(columnIndex, ascending, (Process p) => p.procPid),
-              ),
-              const DataColumn2(label: Text('state'), fixedWidth: 50),
-              DataColumn2(
-                  label: const Text('User'),
-                  fixedWidth: 80,
-                  onSort: (columnIndex, ascending) =>
-                      _sort(columnIndex, ascending, (Process p) => p.userName)),
-              DataColumn2(
-                  label: const Text('%CPU'),
-                  fixedWidth: 80,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) => _sort(
-                      columnIndex, ascending, (Process p) => p.cpuPercentage)),
-              DataColumn2(
-                  label: const Text('utime'),
-                  fixedWidth: 80,
-                  numeric: true,
-                  onSort: (columnIndex, ascending) =>
-                      _sort(columnIndex, ascending, (Process p) => p.userTime)),
-              DataColumn2(
-                  label: const Text('sys'),
-                  numeric: true,
-                  fixedWidth: 80,
-                  onSort: (columnIndex, ascending) => _sort(
-                      columnIndex, ascending, (Process p) => p.systemTime)),
-              DataColumn2(
-                  label: const Text('cmd'),
-                  // fixedWidth: 120,
-                  onSort: (columnIndex, ascending) =>
-                      _sort(columnIndex, ascending, (Process p) => p.command)),
-            ],
-            rows: procList
-                .map((process) => DataRow(
-                        onSelectChanged: (value) =>
-                            _showProcessDialog(context, process),
-                        cells: [
-                          DataCell(Text(process.procPid.toString())),
-                          DataCell(Text(process.state)),
-                          DataCell(Text(process.userName)),
-                          DataCell(
-                              Text(process.cpuPercentage.toStringAsFixed(1))),
-                          DataCell(Text(process.userTime.toString())),
-                          DataCell(Text(process.systemTime.toString())),
-                          DataCell(Text(process.command)),
-                        ]))
-                .toList());
-      },
-    );
+    final statsStream = ref.watch(statsStreamProvider);
+
+    if (!statsStream.hasValue) {
+      return const CircularProgressIndicator();
+    }
+    var procList = statsStream.asData!.value.processes;
+
+    return DataTable2(
+        columnSpacing: 5,
+        sortColumnIndex: currentIndex,
+        sortAscending: ascending,
+        horizontalMargin: 5,
+        isHorizontalScrollBarVisible: false,
+        isVerticalScrollBarVisible: true,
+        scrollController: scrollController,
+        horizontalScrollController: horizontalController,
+        dividerThickness: 1,
+        minWidth: 800,
+        dataRowHeight: 20,
+        showCheckboxColumn: false,
+        columns: [
+          DataColumn2(
+            label: const Text('pid'),
+            numeric: true,
+            fixedWidth: 50,
+            onSort: (columnIndex, ascending) =>
+                _sort(columnIndex, ascending, (Process p) => p.procPid),
+          ),
+          const DataColumn2(label: Text('state'), fixedWidth: 50),
+          DataColumn2(
+              label: const Text('User'),
+              fixedWidth: 80,
+              onSort: (columnIndex, ascending) =>
+                  _sort(columnIndex, ascending, (Process p) => p.userName)),
+          DataColumn2(
+              label: const Text('%CPU'),
+              fixedWidth: 80,
+              numeric: true,
+              onSort: (columnIndex, ascending) => _sort(
+                  columnIndex, ascending, (Process p) => p.cpuPercentage)),
+          DataColumn2(
+              label: const Text('utime'),
+              fixedWidth: 80,
+              numeric: true,
+              onSort: (columnIndex, ascending) =>
+                  _sort(columnIndex, ascending, (Process p) => p.userTime)),
+          DataColumn2(
+              label: const Text('sys'),
+              numeric: true,
+              fixedWidth: 80,
+              onSort: (columnIndex, ascending) =>
+                  _sort(columnIndex, ascending, (Process p) => p.systemTime)),
+          DataColumn2(
+              label: const Text('cmd'),
+              // fixedWidth: 120,
+              onSort: (columnIndex, ascending) =>
+                  _sort(columnIndex, ascending, (Process p) => p.command)),
+        ],
+        rows: procList
+            .map((process) => DataRow(
+                    onSelectChanged: (value) =>
+                        _showProcessDialog(context, process),
+                    cells: [
+                      DataCell(Text(process.procPid.toString())),
+                      DataCell(Text(process.state)),
+                      DataCell(Text(process.userName)),
+                      DataCell(Text(process.cpuPercentage.toStringAsFixed(1))),
+                      DataCell(Text(process.userTime.toString())),
+                      DataCell(Text(process.systemTime.toString())),
+                      DataCell(Text(process.command)),
+                    ]))
+            .toList());
   }
 
   _showProcessDialog(BuildContext context, Process p) {

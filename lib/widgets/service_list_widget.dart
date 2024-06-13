@@ -1,40 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:signals/signals_flutter.dart';
 import 'package:linux_proc/linux_proc.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final svc = futureSignal(() => sysdSvc.getUnits());
+part 'service_list_widget.g.dart';
 
-class ServiceListWidget extends StatelessWidget {
-  const ServiceListWidget({super.key});
+@riverpod
+Future<List<Service>> services(ServicesRef ref) {
+  return sysdSvc.getUnits();
+}
+
+class ServiceListWidget extends ConsumerWidget {
+  ServiceListWidget({super.key});
+
+  final filterController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final svc = ref.watch(servicesProvider);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Watch(
-        (context) => Column(children: [
-          Row(
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    debugPrint('refresh');
-                    svc.reload();
-                  },
-                  child: const Icon(Icons.refresh)),
-              // ElevatedButton(
-              //     onPressed: () {
-              //       print('remove');
-              //     },
-              //     child: const Text('Clear')),
-            ],
-          ),
-          switch (svc.value) {
-            AsyncData data => _SvcList(data.requireValue as List<Service>),
-            AsyncError error => Text('error: ${error.error}'),
-            _ => const Text('loading..'),
-          },
-        ]),
-      ),
+      child: switch (svc) {
+        AsyncData(:final value) => Column(children: [
+            Row(
+              // crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 140,
+                  child: TextField(
+                    controller: filterController,
+                    maxLength: 15,
+                  ),
+                ),
+                const Icon(Icons.filter_list),
+                const SizedBox(width: 50),
+                ElevatedButton(
+                    onPressed: () {
+                      //ref.read(servicesProvider).
+                    },
+                    child: const Icon(Icons.refresh)),
+              ],
+            ),
+            _SvcList(value),
+          ]),
+        AsyncError() => const Text('error !!'),
+        _ => const Text('loading..'),
+      },
     );
   }
 }
@@ -60,13 +73,13 @@ class _SvcList extends StatelessWidget {
   }
 }
 
-class _SvcWidget extends StatelessWidget {
+class _SvcWidget extends ConsumerWidget {
   final Service service;
 
   const _SvcWidget({required this.service});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     Future<void> serviceDialog(Service service) async {
       await showDialog(
           context: context,
@@ -77,12 +90,14 @@ class _SvcWidget extends StatelessWidget {
                 TextButton(
                     onPressed: () {
                       sysdSvc.startUnit(service.unitName);
+
                       Navigator.of(context).pop();
                     },
                     child: const Text('Start Service')),
                 TextButton(
                     onPressed: () {
                       sysdSvc.stopUnit(service.unitName);
+                      // ref.refresh(statsProvider);
                       Navigator.of(context).pop();
                     },
                     child: const Text('Stop Service')),
