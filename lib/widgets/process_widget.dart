@@ -72,7 +72,13 @@ class _ProcessTableState extends ConsumerState<ProcessTable> {
     final statsStream = ref.watch(statsStreamProvider);
 
     if (!statsStream.hasValue) {
-      return const CircularProgressIndicator();
+      return const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Reading Process Status....   '),
+          CircularProgressIndicator(),
+        ],
+      );
     }
     var procList = statsStream.asData!.value.processes;
 

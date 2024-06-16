@@ -74,10 +74,10 @@ class _MyAppState extends ConsumerState<MyApp> with WindowListener {
               ],
             ),
           ),
-          body: TabBarView(children: [
-            const ProcessWidget(),
+          body: const TabBarView(children: [
+            ProcessWidget(),
             ServiceListWidget(),
-            const ResourceGraphWidget(),
+            ResourceGraphWidget(),
           ]),
         ),
       ),

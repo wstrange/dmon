@@ -1,44 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:linux_proc/linux_proc.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 part 'service_list_widget.g.dart';
 
+// @riverpod
+// String servicesFilter(ServicesFilterRef ref) => 'demo';
+
+final servicesFilterProvider = StateProvider<String>((ref) => '');
+
 @riverpod
-Future<List<Service>> services(ServicesRef ref) {
-  return sysdSvc.getUnits();
+Future<List<Service>> services(ServicesRef ref) async {
+  final f = ref.watch(servicesFilterProvider);
+  final ul = await sysdSvc.getUnits();
+
+  return f.isEmpty
+      ? ul
+      : ul.where((s) => s.unitName.toLowerCase().startsWith(f)).toList();
 }
 
-class ServiceListWidget extends ConsumerWidget {
-  ServiceListWidget({super.key});
+final filterKey = GlobalKey();
 
-  final filterController = TextEditingController();
+class ServiceListWidget extends HookConsumerWidget {
+  const ServiceListWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final svc = ref.watch(servicesProvider);
+    final filterController = useTextEditingController();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: switch (svc) {
         AsyncData(:final value) => Column(children: [
             Row(
-              // crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: 140,
+                  width: 200,
                   child: TextField(
                     controller: filterController,
-                    maxLength: 15,
+                    decoration: InputDecoration(
+                      suffixIcon: const Icon(Icons.filter_list),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    key: filterKey,
+                    // maxLength: 15,
+                    autocorrect: false,
+                    autofocus: true,
+                    onChanged: (x) {
+                      ref.read(servicesFilterProvider.notifier).state =
+                          filterController.text.toLowerCase();
+                    },
                   ),
                 ),
-                const Icon(Icons.filter_list),
                 const SizedBox(width: 50),
                 ElevatedButton(
                     onPressed: () {
-                      //ref.read(servicesProvider).
+                      ref.invalidate(servicesProvider);
                     },
                     child: const Icon(Icons.refresh)),
               ],
@@ -88,18 +111,23 @@ class _SvcWidget extends ConsumerWidget {
               title: Text(service.unitName),
               actions: [
                 TextButton(
-                    onPressed: () {
-                      sysdSvc.startUnit(service.unitName);
+                    onPressed: service.isNotRunning()
+                        ? () {
+                            sysdSvc.startUnit(service.unitName);
+                            ref.invalidate(servicesProvider);
 
-                      Navigator.of(context).pop();
-                    },
+                            Navigator.of(context).pop();
+                          }
+                        : null,
                     child: const Text('Start Service')),
                 TextButton(
-                    onPressed: () {
-                      sysdSvc.stopUnit(service.unitName);
-                      // ref.refresh(statsProvider);
-                      Navigator.of(context).pop();
-                    },
+                    onPressed: service.isRunning()
+                        ? () {
+                            sysdSvc.stopUnit(service.unitName);
+                            ref.invalidate(servicesProvider);
+                            Navigator.of(context).pop();
+                          }
+                        : null,
                     child: const Text('Stop Service')),
                 IconButton(
                   icon: const Icon(Icons.cancel),
@@ -117,7 +145,7 @@ class _SvcWidget extends ConsumerWidget {
       subtitle: Text(service.description),
       trailing: Text('${service.loadeState}:${service.subState}'),
       isThreeLine: false,
-      tileColor: Colors.lightBlue[50],
+      tileColor: Colors.lightBlue[10],
       shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(5)),
       onTap: () => serviceDialog(service),
     );
