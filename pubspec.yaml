@@ -12,8 +12,9 @@ dependencies:
     sdk: flutter
   window_manager: ^0.3.8
   # yaru: ^1.2.1
-  linux_proc:
-    path: ../linux_proc
+  # linux_proc:
+  #   path: ../linux_proc
+  linux_proc: ^0.0.2
   data_table_2: ^2.5.15
   fl_chart: ^0.68.0
   collection: ^1.18.0
