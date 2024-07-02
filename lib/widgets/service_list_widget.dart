@@ -6,9 +6,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 part 'service_list_widget.g.dart';
 
-// @riverpod
-// String servicesFilter(ServicesFilterRef ref) => 'demo';
-
 final servicesFilterProvider = StateProvider<String>((ref) => '');
 
 @riverpod
@@ -36,15 +33,21 @@ class ServiceListWidget extends HookConsumerWidget {
       child: switch (svc) {
         AsyncData(:final value) => Column(children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: 200,
+                  width: 300,
                   child: TextField(
                     controller: filterController,
                     decoration: InputDecoration(
-                      suffixIcon: const Icon(Icons.filter_list),
+                      hintText: 'filter services matching...',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          filterController.clear();
+                          ref.read(servicesFilterProvider.notifier).state = '';
+                        },
+                      ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ),

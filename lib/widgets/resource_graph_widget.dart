@@ -50,7 +50,7 @@ class _ResourceGraphWidgetState extends ConsumerState<ResourceGraphWidget> {
         .toList(growable: false);
   }
 
-  // User CPU should stack on top of system - so we add it to the system time
+  // User CPU should visually stack on top of system - so we add it to the system time
   List<FlSpot> userCPU() {
     int i = 0;
     return statsManager.statsQueue
@@ -68,7 +68,7 @@ class _ResourceGraphWidgetState extends ConsumerState<ResourceGraphWidget> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(statsManager.currentStats.memInfo.memAvailable.toString()),
+          // Text(statsManager.currentStats.memInfo.memAvailable.toString()),
           CPULoadText(
               userTime: userTime, systemTime: systemTime, idleTime: idleTime),
           Container(
@@ -79,23 +79,18 @@ class _ResourceGraphWidgetState extends ConsumerState<ResourceGraphWidget> {
                 borderRadius: BorderRadius.circular(10)),
             child: LineChart(
               LineChartData(
-                minX: 0, // Adjust based on your data
-                maxX: 100, // Adjust based on your data
-                minY: 0, // Adjust based on your data
-                maxY: 100, // Adjust based on your data
-
+                minX: 0,
+                maxX: 100,
+                minY: 0,
+                maxY: 100,
                 titlesData: const FlTitlesData(
                   show: false,
-                  // bottomTitles: AxisTitles(Text('CPU')),
-                  // Customize titles and labels as needed
                 ),
                 gridData: const FlGridData(
                   show: false,
-                  // Customize grid lines as needed
                 ),
                 borderData: FlBorderData(
                   show: false,
-                  // Customize border as needed
                 ),
                 lineBarsData: [
                   LineChartBarData(
@@ -107,7 +102,6 @@ class _ResourceGraphWidgetState extends ConsumerState<ResourceGraphWidget> {
                     belowBarData: BarAreaData(
                         show: true, color: Colors.lightBlue.shade50),
                   ),
-
                   LineChartBarData(
                       show: statsManager.statsQueue.isNotEmpty,
                       spots: sysCPU(),
@@ -116,19 +110,6 @@ class _ResourceGraphWidgetState extends ConsumerState<ResourceGraphWidget> {
                       belowBarData:
                           BarAreaData(show: true, color: Colors.red.shade50),
                       isCurved: true),
-
-                  // LineChartBarData(
-                  //   show: _dataPoints.isNotEmpty,
-                  //   spots: _dataPoints,
-                  //   isCurved: false, // Change to true for curved lines
-                  //   barWidth: 2,
-                  //   color: Colors.blue, // Customize color
-                  //   dotData: const FlDotData(show: false), // Customize dots
-                  //   belowBarData: BarAreaData(
-                  //     show: true,
-                  //     color: Colors.lightBlue,
-                  //   ),
-                  // ),
                 ],
               ),
             ),
