@@ -15,7 +15,7 @@ Future<List<Service>> services(ServicesRef ref) async {
 
   return f.isEmpty
       ? ul
-      : ul.where((s) => s.unitName.toLowerCase().startsWith(f)).toList();
+      : ul.where((s) => s.unitName.toLowerCase().contains(f)).toList();
 }
 
 final filterKey = GlobalKey();
